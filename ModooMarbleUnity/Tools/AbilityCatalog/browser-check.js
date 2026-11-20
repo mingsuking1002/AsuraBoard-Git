@@ -1,0 +1,33 @@
+"use strict";
+const fs=require('fs'),path=require('path'),assert=require('assert');
+const {chromium}=require('C:/Users/ksh00/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+let testBrowser;
+(async()=>{
+ const root=path.resolve(__dirname,'../..'),out=path.join(root,'Validation/ability-studio');fs.mkdirSync(out,{recursive:true});
+ const browser=testBrowser=await chromium.launch({headless:true,downloadsPath:out,executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',args:['--disable-background-networking','--disable-component-update','--disable-sync']});
+ const context=await browser.newContext({viewport:{width:1440,height:1050},acceptDownloads:true});const page=await context.newPage();const errors=[],requests=[];
+ page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>requests.push(r.url()));
+ const url='file:///'+path.join(root,'Documentation/research/splus-items/index.html').replace(/\\/g,'/');
+ await page.goto(url);await page.locator('.ability-row').first().waitFor();assert(await page.locator('.ability-row').count()===40);
+ const text=await page.locator('body').innerText();assert(text.includes('(스킬밸류)'));assert(await page.locator('.ability-card').count()===0);assert(!/미연결|원문|등급|근거|문맥|ADD-\d/.test(text));
+ await page.screenshot({path:path.join(out,'catalog-desktop.png'),fullPage:false});
+ await page.locator('[data-origin="module"]').click();await page.waitForTimeout(80);assert((await page.locator('#result-count').innerText()).includes('62개'));
+ await page.locator('.ability-row .add-button').first().click();assert(await page.locator('.plan-item').count()===1);assert(await page.locator('body').getAttribute('class').then(v=>v.includes('plan-open')));
+ await page.locator('#draft-name').fill('절약하는 건물주');await page.locator('#draft-memo').fill('할인과 지연 환급을 연결하는 기획');await page.locator('.plan-item textarea').fill('내가 지불할 통행료를 50% 줄인다.');
+ await page.reload();assert(await page.locator('#draft-name').inputValue()==='절약하는 건물주');assert(await page.locator('.plan-item textarea').inputValue()==='내가 지불할 통행료를 50% 줄인다.');
+ await page.locator('#plan-toggle').click();await page.waitForTimeout(240);await page.screenshot({path:path.join(out,'catalog-planning.png')});
+ await page.evaluate(()=>{window.__lastExport=null;const original=URL.createObjectURL;URL.createObjectURL=function(blob){window.__lastExport=blob;return original.call(this,blob);};});await page.locator('#export-plan').click();const markdown=await page.evaluate(()=>window.__lastExport.text());assert(markdown.includes('50%')&&markdown.includes('절약하는 건물주'));
+ await page.locator('#export-json').click();const jsonText=await page.evaluate(()=>window.__lastExport.text());const exported=JSON.parse(jsonText);assert(exported.format==='worldcircuit-ability-plans'&&exported.drafts.length===1);
+ const importPath=path.join(out,'round-trip-plans.json');fs.writeFileSync(importPath,jsonText);await page.locator('#import-file').setInputFiles(importPath);await page.waitForTimeout(180);assert(await page.locator('#draft-select option').count()===2);assert(await page.locator('.plan-item textarea').inputValue()==='내가 지불할 통행료를 50% 줄인다.');
+ await page.locator('#plan-close').click();await page.waitForTimeout(230);
+ await page.locator('[data-origin="module"]').click();await page.locator('.details-button').first().click();assert(await page.locator('#ability-dialog').evaluate(d=>d.open));
+ await page.locator('#detail-effect').fill('조건을 만족하면 통행료를 70% 줄인다.');await page.locator('#detail-add').click();assert(await page.locator('.plan-item textarea').last().inputValue()==='조건을 만족하면 통행료를 70% 줄인다.');
+ await page.locator('#plan-close').click();await page.waitForTimeout(230);await page.locator('.favorite').first().click();await page.locator('[data-category="favorites"]').click();assert(await page.locator('.ability-row').count()===1);
+ await page.locator('#reset-filters').click();await page.locator('#search').fill('통행료 스킬밸류');await page.waitForTimeout(220);assert(await page.locator('.ability-row').count()>0);
+ await page.locator('#reset-filters').click();await page.setViewportSize({width:390,height:844});await page.waitForTimeout(350);assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ await page.evaluate(()=>document.querySelector('#toast').classList.remove('show'));await page.screenshot({path:path.join(out,'catalog-mobile.png'),animations:'disabled'});await page.locator('#menu-toggle').click();await page.locator('[data-category="body"]').click();assert((await page.locator('#section-title').innerText())==='신체·거래');
+ assert(!requests.some(u=>/catalog-data\.js|provenance|all-text-records/.test(u)));assert(errors.length===0,errors.join('\n'));
+ const report={status:'passed',headlessLocalBrowser:true,desktop:{width:1440,height:1050},mobile:{width:390,height:844},runtimeErrors:errors.length,
+ filters:true,listLayout:true,skillValuePlaceholders:true,projectModuleCount62:true,selection:true,editableEffects:true,localSaveReload:true,markdownExportPayload:true,jsonExportPayload:true,jsonImportRoundTrip:true,nativeBrowserDownloadVerified:false,favorites:true,modal:true,mobileNavigation:true,noHorizontalOverflow:true,evidenceNotLoaded:true};
+ fs.writeFileSync(path.join(out,'browser-validation.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));await browser.close();
+})().catch(async e=>{console.error(e);if(testBrowser)await testBrowser.close();process.exitCode=1;});

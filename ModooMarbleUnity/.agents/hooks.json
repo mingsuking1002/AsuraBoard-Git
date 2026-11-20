@@ -1,0 +1,11 @@
+{
+  "handoff": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "python \"Tools/handoff_hook.py\" antigravity",
+        "timeout": 5
+      }
+    ]
+  }
+}
