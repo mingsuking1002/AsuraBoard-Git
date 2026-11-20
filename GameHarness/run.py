@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+from tempfile import NamedTemporaryFile
 import uuid
 
 
@@ -18,14 +19,50 @@ def digest(path):
     return h.hexdigest()
 
 
+def record_work(root, profile, args):
+    history = (root / profile["wikiHistory"]).resolve()
+    if not history.is_relative_to(root):
+        raise ValueError("wikiHistory must be inside the project")
+    fields = [args.title, args.summary, args.evidence, args.next]
+    if any(not value or len(value.splitlines()) != 1 for value in fields):
+        raise ValueError("Each record field must be a non-empty single line")
+    heading, separator, previous = history.read_text(encoding="utf-8-sig").partition("\n")
+    if not separator or not heading.startswith("# "):
+        raise ValueError("wikiHistory must start with a Markdown heading")
+    day = datetime.now().astimezone().date().isoformat()
+    entry = (
+        f"## {day} · {args.title}\n\n"
+        f"- 변경 내용과 이유 — {args.summary}\n"
+        f"- 검증과 증거 — {args.evidence}\n"
+        f"- 남은 작업 — {args.next}\n"
+    )
+    with NamedTemporaryFile(mode="w", encoding="utf-8", newline="\n", dir=history.parent, delete=False) as temp:
+        draft = Path(temp.name)
+        temp.write(f"{heading}\n\n{entry}\n{previous.lstrip(chr(10))}")
+    try:
+        draft.replace(history)
+    finally:
+        draft.unlink(missing_ok=True)
+    print(history)
+    return 0
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=["status", "doctor", "check"])
+    parser.add_argument("action", choices=["status", "doctor", "check", "record"])
     parser.add_argument("name", nargs="?")
     parser.add_argument("--project", type=Path, default=Path.cwd())
+    for field in ("title", "summary", "evidence", "next"):
+        parser.add_argument("--" + field)
     args = parser.parse_args()
     root = args.project.resolve()
     profile = json.loads((root / "harness.json").read_text(encoding="utf-8-sig"))
+    if args.action == "record":
+        if args.name or not all((args.title, args.summary, args.evidence, args.next)):
+            parser.error("record requires --title, --summary, --evidence and --next")
+        if "wikiHistory" not in profile:
+            parser.error("Set wikiHistory in harness.json to enable work records")
+        return record_work(root, profile, args)
     if args.action == "status":
         print((root / "HANDOFF.md").read_text(encoding="utf-8-sig"))
         return 0

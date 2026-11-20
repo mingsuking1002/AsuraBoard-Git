@@ -24,9 +24,10 @@ doctor가 누락 파일을 표시하면 harness.json과 Validation/VerifySource.
 
 ## 작업 기록을 위키에 반영하기
 
-게임 폴더의 Documentation/wiki가 장기 문서 원본이다. 사용법·구조가 바뀌면 해당 페이지를 수정하고 history.md 맨 위에 날짜, 변경 이유, 검증 증거, 미확인 항목을 추가한다. 최근 작업 담당과 다음 행동은 HANDOFF.md에 적는다. 두 도구 모두 게임 루트에서 다음 명령으로 오프라인 위키를 갱신하고 검증한다.
+게임 폴더의 Documentation/wiki가 장기 문서 원본이다. 사용법·구조가 바뀌면 해당 페이지를 수정한다. 검증을 마친 뒤 하네스로 변경 이유, 증거와 남은 일을 이력에 추가한다. 최근 작업 담당과 다음 행동은 HANDOFF.md에 적는다. 두 도구 모두 게임 루트에서 다음 명령을 사용한다.
 
 ~~~powershell
+python ../GameHarness/run.py record --title "작업 제목" --summary "변경과 이유" --evidence "검사 결과와 로그 경로" --next "남은 작업"
 python ../GameHarness/run.py check wiki
 ~~~
 

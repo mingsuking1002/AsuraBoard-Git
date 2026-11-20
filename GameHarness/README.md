@@ -8,4 +8,15 @@
 
 새 게임 연결 시 harness.json에 requiredFiles, tools, reports, checks를 정의한다. checks의 각 항목은 command 인자 배열과 선택적인 timeout(초), identify(해시를 기록할 파일), result(결과 폴더 아래 status 필드가 있는 JSON)로 구성한다. {out}은 이번 결과 경로다. 아수라판의 harness.json을 예제로 삼고 해당 게임의 실제 검사만 등록한다. 기존 AGENTS.md에는 게임별 절차를 병합한다. 조사 프로젝트는 기록만 사용해도 된다.
 
+## 위키 작업 기록
+
+각 게임의 harness.json에 `wikiHistory`로 게임 폴더 안의 Markdown 이력 파일을 지정한다. 파일의 첫 줄은 제목으로 둔다. 해당 게임의 작업자가 구현과 관련 검증을 마친 뒤 변경 이유, 결과나 증거 경로, 남은 일을 입력한다. 명령은 기존 이력을 보존하고 최신 항목을 맨 위에 추가한다.
+
+```powershell
+python ../GameHarness/run.py record --title "작업 제목" --summary "변경 내용과 이유" --evidence "통과한 검사와 결과 파일 경로, 미실행 항목" --next "다음 작업 또는 없음"
+python ../GameHarness/run.py check wiki
+```
+
+교대 전에는 현재 담당과 다음 행동을 HANDOFF.md에 적는다. `check wiki`는 프로젝트가 등록한 위키 빌드·검증을 실행한다. 아수라판은 변경 이력과 인수인계를 공용 오프라인 HTML에 함께 반영한다. Git에는 각 게임의 원본 Markdown과 이미 추적 중인 검증 요약을 기록한다.
+
 OpenAI의 [저장소 중심 개발 사례](https://openai.com/index/harness-engineering/)에서 짧은 안내와 실행 가능한 검사를, Anthropic의 [장기 작업 사례](https://www.anthropic.com/research/effective-harnesses-for-long-running-agents)에서 완료 조건과 교대 기록을 가져왔다. 교대할 때 반복해서 찾게 되는 정보와 놓친 결함을 근거로 규칙을 보완한다.

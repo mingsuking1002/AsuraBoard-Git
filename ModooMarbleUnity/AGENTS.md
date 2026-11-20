@@ -1,6 +1,6 @@
 # 아수라판 작업 규칙
 
-기능·실행법·검증·인계 상태가 바뀌면 Documentation/wiki와 HANDOFF.md를 함께 확인한다. 장기 변경은 history.md에 날짜·이유·증거를 누적하고, 교대 전에 게임 루트에서 `python ../GameHarness/run.py check wiki`로 공용 오프라인 위키에 반영한다.
+기능·실행법·검증·인계 상태가 바뀌면 Documentation/wiki와 HANDOFF.md를 함께 확인한다. 기능 단위의 변경은 GameHarness README의 `record` 명령으로 이유·검증 증거·남은 일을 history.md에 기록한다. 교대 전에 게임 루트에서 `python ../GameHarness/run.py check wiki`로 공용 오프라인 위키에 반영한다.
 
 이 폴더를 두 클라이언트의 프로젝트 루트로 연다. 작업 시작 시 HANDOFF.md를 읽고 현재 사용자 요청과 대조한다. 코드 수정 전 목표와 플레이어가 확인할 수 있는 완료 조건을 적는다. 단순 질문은 파일 기록 없이 답한다.
 
