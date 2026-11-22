@@ -4,17 +4,17 @@
 
 0.15.3 변경: 출발지·무인도·올림픽·여행 칸을 기존 대비 가로·세로 각각 1.5배(136×86 → 204×129, 중심 유지)로 확대했다. 커진 모서리 면을 우선 클릭 판정하고 인접 칸은 그 경계에 맞춰 잘라낸다. 이름·통행료는 잘린 타일의 실제 상판 중심으로 정렬한다. 건물도 해당 중심 기준 안쪽으로 배치한다. `Validation/unity-large-corners-build-validation.json`: 검사 290개 및 빌드 통과, 경고·오류 0개. `Validation/unity-large-corners-verified/runtime-validation.json`: 실제 실행 passed, 캡처 `01-normal.png` 확인. `Validation/unity-large-corners-publish.json`: 기존 실행 경로의 146개 파일 해시 일치. 비활성 경제의 시야 검증은 단위 표기(G/만)가 달라지는 글자 대신 근거리·좌우 월드 표본을 비교한다.
 
-0.15.2 변경: 사용자의 ‘모마처럼 타일’ 요청에 맞춰 Synty 바닥의 솟은 턱을 상판 아래로 내리고 별도의 평평한 입체 상판을 추가했다. 선명한 평면, 약 1px 베벨, 총 8px 깊이의 얕은 옆면으로 구성한다. 인접한 큰 모서리 칸의 경계로 일반 칸 상판을 잘라 겹침을 제거하고 약 1~2px 이음새를 둔다. 색 띠는 제거하고 타일 면 전체에 도시 그룹·소유자 색을 적용했다. 개발용 칸 번호도 숨겼다. 클릭 영역과 이동 경로는 그대로다.
+0.15.2 변경: Synty 바닥의 솟은 턱을 상판 아래로 내리고 별도의 평평한 입체 상판을 추가했다. 선명한 평면, 약 1px 베벨, 총 8px 깊이의 얕은 옆면으로 구성한다. 인접한 큰 모서리 칸의 경계로 일반 칸 상판을 잘라 겹침을 제거하고 약 1~2px 이음새를 둔다. 색 띠는 제거하고 타일 면 전체에 도시 그룹·소유자 색을 적용했다. 개발용 칸 번호도 숨겼다. 클릭 영역과 이동 경로는 그대로다.
 
 0.15.2 검증: `Validation/unity-flat-tiles-verified/runtime-validation.json` passed. 원본 바닥 메시 로드·32칸·시야·복구·이동 확대 통과. 실제 전체 보드 캡처 `01-normal.png` 확인. `Validation/unity-flat-tiles-build-validation.json`: 기존 검사 290개, 빌드 Succeeded, 경고·오류 0개. `Validation/unity-flat-tiles-publish.json`: 기존 실행 경로의 146개 파일 해시 일치.
 
 0.15.1 변경: 보드의 검은 외곽선·안쪽 선·상시 칸 테두리·소유자 테두리를 제거했다. 입체 바닥판, 칸 색 띠, 클릭 선택·이동 목적지 강조는 유지한다. 실제 화면 `Validation/unity-board-no-lines-verified/01-normal.png`를 확인했고 같은 폴더의 실행 검증은 passed다. 규칙 검사 290개 및 빌드 통과, 경고·오류 0개. 기존 실행 경로 반영 후 146개 파일 해시 일치를 확인했다(`Validation/unity-board-no-lines-publish.json`).
 
-사용자가 다운로드한 `POLYGON - Starter Pack - Art by Synty`의 `SM_PolygonPrototype_Buildings_Floor_1x1_01P` 모델을 32칸에 적용했다. 썸네일을 바닥으로 그리는 방식이 아니라 원본 FBX 메시를 Unity에서 임포트해 실제 입체 모델로 렌더한다.
+`POLYGON - Starter Pack - Art by Synty`의 `SM_PolygonPrototype_Buildings_Floor_1x1_01P` 모델을 32칸에 적용했다. 썸네일을 바닥으로 그리는 방식이 아니라 원본 FBX 메시를 Unity에서 임포트해 실제 입체 모델로 렌더한다.
 
 ## 출처와 반입 범위
 
-- 원본: 사용자 Unity Asset Store 캐시의 POLYGON Starter Pack.
+- 원본: Unity Asset Store의 POLYGON Starter Pack.
 - 프로젝트 파일: `Assets/Marble/Resources/Downloaded/Synty/Floor1x1.fbx`.
 - 원본 GUID: `efecce0669e04d14aada7871935a434d`.
 - FBX SHA-256: `acd9a12c9cf8ab363a65e9a3b3a76ee8effbd6d07121e1cdcc0d0a8f6eda1463`.

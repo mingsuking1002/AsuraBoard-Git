@@ -87,7 +87,52 @@ namespace Marble.Online
             Action[] cases={WireRoundTrip,MalformedWire,PrivateAdmission,ReadyAndHost,OutOfTurn,DuplicateRequest,
                 ForgedCommit,DroppedCommitResync,BadHashResync,LostRequestRecovery,HostDeparture,MemberDeparture,
                 HeartbeatTimeout,ReadyResetOnRejoin,FinishedRematch,FullGames,AugmentSelection,AugmentSyncRepair,ConcurrentAugmentRequests,AugmentSettings,SpecialAugmentAuthority,DraftPendingIsPerAction,ConstructionSync,SimultaneousRerolls,RerollSyncRepair,MapAndAppearanceLobby,GuestLobbyReturnAndRematch,ControlledDiceAndCosmeticSync,GoldenRerollRepair,BodySaleAndRepair,GuestBodySale,BodyDuringDraftBlocked};
-            foreach(var test in cases)test();return cases.Length;
+            foreach(var test in cases)test();
+            HealthDamageSync();
+            HealthDamageTurnAndReplay();
+            return cases.Length + 2;
+        }
+        static void HealthDamageSync()
+        {
+            using (var g = new Group(2))
+            {
+                g.Start();
+                var host = g.Sessions[0];
+                var guest = g.Sessions[1];
+                int target = 1;
+                Assert(!guest.ApplyHealthDamage(target, 100), "guest cannot issue damage");
+                Assert(!host.Submit(Game.HealthDamageAction(target, 100)), "damage is not a player action");
+                Assert(!host.ApplyHealthDamage(-1, 100) && !host.ApplyHealthDamage(target, 0), "invalid damage rejected");
+                Assert(host.ApplyHealthDamage(target, 35), "partial damage");
+                g.Hub.Pump();
+                Assert(guest.Model.Players[target].Health == 65, "partial damage synchronized");
+                Assert(host.ApplyHealthDamage(target, int.MaxValue), "lethal damage");
+                g.Hub.Pump();
+                var victim = guest.Model.Players[target];
+                Assert(victim.Health == 0 && victim.IslandTurns == 3 &&
+                    guest.Model.Tiles[victim.Position].Definition.Kind == TileKind.Island &&
+                    guest.Model.CurrentPlayerIndex == 0, "off-turn knockout preserves active turn");
+                Assert(!host.ApplyHealthDamage(target, 1), "zero health cannot retrigger island");
+                g.Equal();
+            }
+        }
+        static void HealthDamageTurnAndReplay()
+        {
+            var config = new GameConfig { Seed = 7, PlayerCount = 2, EnableAugments = false };
+            var game = new Game(config);
+            Assert(game.Execute("roll") && game.Players.All(p => p.Health == PlayerState.MaxHealth), "ordinary play keeps health");
+            int seat = game.CurrentPlayerIndex;
+            Assert(game.ApplyHealthDamage(seat, 100) && game.CurrentPlayerIndex != seat, "knockout ends the active turn");
+            Assert(game.ActionMovement.Count == 1 && game.ActionMovement[0].Seat == seat && game.ActionMovement[0].Transfer,
+                "knockout is a direct transfer");
+            game = Game.Replay(config, game.ReplayActions);
+            Assert(game.Players[seat].Health == 0 && game.History.Any(line => line.Contains("체력 0")), "knockout replay");
+            var escape = new Game(config);
+            escape.ApplyHealthDamage(1, 100);
+            for (int i = 0; i < 24 && escape.CurrentPlayerIndex != 1; i++)
+                Assert(escape.Execute(escape.ChooseAiAction()), "advance toward the island player's turn");
+            Assert(escape.CurrentPlayerIndex == 1 && escape.Execute("island_pay") &&
+                escape.Players[1].Health == PlayerState.MaxHealth, "escaping restores full health");
         }
         static void WireRoundTrip()
         {

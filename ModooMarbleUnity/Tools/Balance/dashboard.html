@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>아수라판 · 증강 밸런스</title>
+<style>
+:root{color-scheme:dark;font:16px/1.55 system-ui;background:#101a19;color:#e4eee9}
+body{max-width:1250px;margin:auto;padding:32px}
+h1{font-size:2.2rem;margin:0} h2{font-size:1.3rem}
+p,small{color:#a9bcb5} section{background:#192a27;border:1px solid #34514a;padding:20px;margin:18px 0;border-radius:12px}
+label{margin-right:18px} select,button,input{font:inherit} select,button{padding:6px;color:#e5f8ef;background:#28453d;border:1px solid #658075;border-radius:6px}
+table{border-collapse:collapse;width:100%;text-align:right} th,td{border-bottom:1px solid #34514a;padding:9px;white-space:nowrap} th:first-child,td:first-child{text-align:left} .scroll{overflow:auto}
+strong{color:#ffd183} output{display:block;white-space:pre-wrap;margin:.8rem 0} .score{font-size:1.15rem}
+</style>
+<header><h1>아수라판 · 증강 밸런스</h1><p id="summary"></p></header>
+<section>
+<label>맵 <select id="map"><option value="">전체</option><option value="0">세계 한 바퀴</option><option value="1">해안 한 바퀴</option></select></label>
+<label>선택 노이즈 <select id="noise"><option value="">전체</option><option value="0">낮음</option><option value="1">보통</option><option value="2">높음</option></select></label>
+<label>AI 성향 <select id="profile"><option value="">전체</option><option>공격</option><option>방어</option><option>금전</option><option>도박</option><option>시너지</option></select></label>
+<div class="scroll"><table><thead><tr><th>증강</th><th>제시 슬롯</th><th>선택</th><th>보유 표본</th><th>평균 순이득 G</th><th>평균 피해 / 방어</th><th>무인도</th><th>보유 승률</th><th>비교 경기 승률 차이</th></tr></thead><tbody id="cards"></tbody></table></div>
+<small>제시는 최종 후보 슬롯 기준. 평균의 분모는 증강을 보유한 좌석·경기이며 미발동을 포함합니다. 승률 차이는 같은 시드의 강제 지급과 기준 경기 비교입니다.</small>
+</section>
+<section><h2>경기 기록</h2><select id="match" aria-label="경기 선택"></select>
+<label>증강 <select id="effect-card"><option value="">전체</option><option value="0">절약 계약</option><option value="1">정기 수입</option><option value="2">위험 투자</option><option value="3">견제 사격</option><option value="4">보호막</option></select></label>
+<button id="play">20배속 효과 보기</button><input id="turn" type="range" min="1" value="1" aria-label="경기 턴">
+<output id="details"></output><div class="scroll"><table><thead><tr><th>좌석 / 대상</th><th>증강</th><th>순이득 G</th><th>상대 G</th><th>피해</th><th>방어</th><th>초과 피해</th><th>이송</th><th>회당 기대 G</th><th>시너지</th></tr></thead><tbody id="effects"></tbody></table></div>
+<small>20배속은 턴당 기준 1초를 50ms로 환산한 기록 재생입니다. 자동 경기 계산은 화면 없이 실행합니다.</small>
+</section>
+<script>
+const games = /*__MATCHES__*/[];
+const names=["절약 계약","정기 수입","위험 투자","견제 사격","보호막"];
+const $=id=>document.getElementById(id);
+const name=id=>names[id]||"기준 선택";
+const percent=(wins,count)=>count?(100*wins/count).toFixed(1)+"%":"—";
+let subset=[],playback;
+function fill(target,rows){
+  target.replaceChildren(...rows.map(row=>{
+    const tr=document.createElement("tr");
+    for(const value of row){const cell=tr.insertCell();cell.textContent=value;}
+    return tr;
+  }));
+}
+function refresh(){
+  stop();
+  subset=games.filter(g=>["map","noise"].every(k=>$(k).value===""||g[k]===Number($(k).value)));
+  const accepted=p=>!$("profile").value||p.profile===$("profile").value;
+  const free=subset.filter(g=>g.forced===-2);
+  const baseline=new Map(subset.filter(g=>g.forced===-1).map(g=>[g.seed,g]));
+  fill($("cards"),names.map((label,id)=>{
+    let offers=0,picks=0,owners=0,wins=0,cash=0,damage=0,prevented=0,islands=0,delta=0,pairs=0;
+    for(const g of free){
+      const seats=g.seats.filter(accepted);
+      for(const p of seats){
+        for(const c of g.choices.filter(c=>c.seat===p.seat&&"card" in c)){offers+=c.offers.filter(x=>x===id).length;picks+=Number(c.card===id);}
+        if(!p.cards.includes(id))continue;
+        owners++;wins+=Number(p.place===1);
+        for(const e of g.events.filter(e=>e.seat===p.seat&&e.card===id)){
+          cash+=e.cash;damage+=e.damage;prevented+=e.prevented;islands+=e.island;
+        }
+      }
+    }
+    for(const g of subset.filter(g=>g.forced===id)){
+      const base=baseline.get(g.seed);
+      if(!base||!accepted(g.seats.find(p=>p.seat===g.subject)))continue;
+      pairs++;delta+=Number(g.winner===g.subject)-Number(base.winner===base.subject);
+    }
+    const avg=n=>owners?(n/owners).toFixed(1):"—";
+    const diff=pairs?`${delta>=0?"+":""}${(100*delta/pairs).toFixed(1)}%p (n=${pairs}${pairs<30?", 소표본":""})`:"—";
+    return [label,offers,picks,owners,avg(cash),avg(damage)+" / "+avg(prevented),islands,percent(wins,owners),diff];
+  }));
+  $("summary").textContent=`자유 선택 ${free.length}판 · 비교 실험 ${subset.length-free.length}판 · 4인 AI`;
+  $("match").replaceChildren(...subset.map((g,i)=>new Option(`시드 ${g.seed} · ${g.forced===-2?"자유 선택":name(g.forced)} · ${g.turns}턴`,i)));
+  selectMatch();
+}
+function stop(){clearInterval(playback);$("play").textContent="20배속 효과 보기";playback=null;}
+function selectMatch(){stop();const g=subset[Number($("match").value)];$("turn").max=g?.turns||1;$("turn").value=1;showTurn();}
+function showTurn(){
+  const g=subset[Number($("match").value)];
+  if(!g){$("details").textContent="경기 데이터 없음";fill($("effects"),[]);return;}
+  const t=Number($("turn").value);
+  const picks=g.choices.filter(c=>c.turn<=t).map(c=>"card" in c
+      ? `${c.draft+1}단계 · P${c.seat+1} · ${c.offers.map((id,i)=>name(id)+" "+c.scores[i].toFixed(1)).join(" / ")} → ${name(c.card)}`
+      : `${c.draft+1}단계 · P${c.seat+1} · ${c.golden?"황금 리롤":"리롤"} · ${name(c.before[c.reroll])} → ${name(c.replacement)}`);
+  const chosen=$("effect-card").value;
+  const seen=g.events.filter(e=>e.turn<=t&&(chosen===""||e.card===Number(chosen)));
+  const seats=g.seats.map(p=>{
+    const effects=seen.filter(e=>e.seat===p.seat);
+    const total=key=>effects.reduce((sum,e)=>sum+e[key],0);
+    return `P${p.seat+1} ${p.profile} · 효과 ${total("cash")}G · 피해 ${total("damage")} · 방어 ${total("prevented")}`;
+  });
+  $("details").textContent=`${t} / ${g.turns}턴 · 최종 1위 P${g.winner+1} · 시드 ${g.seed}, 맵 ${g.map}, 노이즈 ${g.noise}, 좌석 회전 ${g.rotation}, 지급 ${g.forced}\n`
+      +seats.join("\n")+"\n"+picks.join("\n");
+  fill($("effects"),seen.slice(-16).reverse().map(e=>[
+    `${e.turn}턴 P${e.seat+1}${e.target<0?"":" → P"+(e.target+1)}`,name(e.card),e.cash,e.rivalCash,e.damage,e.prevented,e.excess,e.island,e.expectedCash??"—",e.synergy??"—"
+  ]));
+}
+for(const id of ["map","noise","profile"])$(id).onchange=refresh;
+$("match").onchange=selectMatch;
+$("turn").oninput=showTurn;
+$("effect-card").onchange=showTurn;
+$("play").onclick=()=>{
+  if(playback){stop();return;}
+  if($("turn").value===$("turn").max)$("turn").value=1;
+  $("play").textContent="일시정지";
+  playback=setInterval(()=>{if(Number($("turn").value)>=Number($("turn").max)){stop();return;} $("turn").value=Number($("turn").value)+1;showTurn();},50);
+};
+refresh();
+</script>
+</html>

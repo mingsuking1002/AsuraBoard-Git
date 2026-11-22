@@ -52,7 +52,7 @@ namespace Marble.Online
 
     public static class OnlineProtocol
     {
-        public const string Compatibility="marble-classic-online-11";
+        public const string Compatibility="marble-classic-online-12";
         public const string GameKey="modoo-marble-local-reconstruction";
         public const int MaxPacket=262144, MaxActions=8192;
         static readonly Encoding Utf8=new UTF8Encoding(false,true);
@@ -120,7 +120,7 @@ namespace Marble.Online
                 w.Write(g.CurrentPlayerIndex);w.Write((int)g.Phase);w.Write(g.TurnNumber);w.Write(g.DiceA);w.Write(g.DiceB);w.Write(g.LastDiceControlled);w.Write(g.LastDiceTarget);w.Write(g.LastDiceParity);w.Write(g.LastDiceActor);
                 w.Write(g.WinnerIndex);w.Write(g.WinnerReason??"");w.Write(g.DebtAmount);w.Write(g.DebtCreditorIndex);w.Write(g.ExtraRollPending);
                 foreach(var p in g.Players){w.Write(p.Index);w.Write(p.Avatar);w.Write(p.ColorIndex);w.Write(p.DiceSkin);w.Write(p.Outfit);w.Write(p.Cash);w.Write(p.Position);w.Write(p.Laps);w.Write(p.IslandTurns);
-                    w.Write(p.EscapeCards);w.Write(p.ShieldCards);w.Write(p.PendingTravel);w.Write(p.LoanUsed);w.Write(p.LoanBalance);w.Write(p.Bankrupt);w.Write(p.SoldBodyMask);w.Write(p.LastBodySaleTurn);w.Write(p.CreditDueRound);
+                    w.Write(p.EscapeCards);w.Write(p.ShieldCards);w.Write(p.PendingTravel);w.Write(p.LoanUsed);w.Write(p.LoanBalance);w.Write(p.Bankrupt);w.Write(p.SoldBodyMask);w.Write(p.LastBodySaleTurn);w.Write(p.CreditDueRound);w.Write(p.Health);
                     w.Write(g.AugmentRerollMask(p.Index));w.Write(g.GoldenRerollSlot(p.Index));w.Write(p.Augments.Count);foreach(var choice in p.Augments){w.Write(choice.DraftIndex);w.Write(choice.OptionIndex);w.Write((int)choice.Tier);w.Write(choice.Rerolled);w.Write(choice.GoldenRerolled);}}
                 foreach(var t in g.Tiles){w.Write(t.Index);w.Write(t.OwnerIndex);w.Write(t.Level);w.Write(t.Buildings);w.Write(t.Landmark);w.Write(t.FestivalMultiplier);w.Write(t.ResortArrivals);}
                 w.Write(g.ReplayActions.Count);foreach(var action in g.ReplayActions)w.Write(action);

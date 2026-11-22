@@ -78,6 +78,8 @@ namespace Marble.Core
     [Serializable]
     public sealed class PlayerState
     {
+        public const int MaxHealth = 100;
+        public int Health { get; internal set; } = MaxHealth;
         public int Index;
         public int Avatar,ColorIndex,DiceSkin;
         public int Outfit=WardrobeCatalog.DefaultCode;
@@ -259,6 +261,8 @@ namespace Marble.Core
 
         public bool Execute(string actionId)
         {
+            if (actionId != null && actionId.StartsWith("system:damage:", StringComparison.Ordinal))
+                return ExecuteHealthDamage(actionId);
             if(actionId=="system:augment")return ExecuteSpecialAugment();
             if(Phase==GamePhase.Augment)return TryExecuteAugment(actionId);
             var action = GetActions().FirstOrDefault(a=>a.Id==actionId);
@@ -269,8 +273,8 @@ namespace Marble.Core
             if(IsEconomyAction(actionId))ExecuteEconomyAction(actionId,action);
             else if (actionId=="roll") Roll();
             else if(actionId.StartsWith("roll_control:",StringComparison.Ordinal)){var parts=actionId.Split(':');RollControlled(int.Parse(parts[1]),int.Parse(parts[2]));}
-            else if (actionId=="island_pay") { p.Cash-=Config.IslandFee; p.IslandTurns=0; Note("탈출 비용 "+Config.IslandFee+" 지불"); }
-            else if (actionId=="island_card") { p.EscapeCards--; p.IslandTurns=0; Note("무인도 탈출 카드 사용"); }
+            else if (actionId=="island_pay") { p.Cash-=Config.IslandFee; LeaveIsland(); Note("탈출 비용 "+Config.IslandFee+" 지불"); }
+            else if (actionId=="island_card") { p.EscapeCards--; LeaveIsland(); Note("무인도 탈출 카드 사용"); }
             else if(actionId.StartsWith("purchase:",StringComparison.Ordinal))
             {
                 var t=Tiles[p.Position];int mask=int.Parse(actionId.Substring(9));
@@ -428,12 +432,12 @@ namespace Marble.Core
             if(escaping)
             {
                 _extraRoll=false;
-                if(DiceA==DiceB) { CurrentPlayer.IslandTurns=0; MoveRolledSteps(DiceA+DiceB); ResolveLanding(0); }
+                if(DiceA==DiceB) { LeaveIsland(); MoveRolledSteps(DiceA+DiceB); ResolveLanding(0); }
                 else
                 {
                     CurrentPlayer.IslandTurns--;
                     if(CurrentPlayer.IslandTurns==0)
-                        BeginPayment(Config.IslandFee,-1,()=> { MoveRolledSteps(DiceA+DiceB); ResolveLanding(0); });
+                        BeginPayment(Config.IslandFee,-1,()=> { LeaveIsland(); MoveRolledSteps(DiceA+DiceB); ResolveLanding(0); });
                     else { Note("무인도 탈출 실패 · 남은 대기 "+CurrentPlayer.IslandTurns+"회"); EndTurn(); }
                 }
                 return;
@@ -482,7 +486,12 @@ namespace Marble.Core
                 {
                     long toll=GetToll(t.Index);
                     if(CurrentPlayer.ShieldCards>0) { CurrentPlayer.ShieldCards--; Note("통행료 면제 카드 자동 사용"); _canTakeover=t.Level<4; }
-                    else BeginPayment(toll,t.OwnerIndex,()=> { Phase=GamePhase.Decision; _canTakeover=t.Level<4; });
+                    else
+                    {
+                        if (TollAdjustment != null)
+                            toll = Math.Clamp(TollAdjustment(CurrentPlayerIndex, t.OwnerIndex, toll), 0, toll);
+                        BeginPayment(toll,t.OwnerIndex,()=> { Phase=GamePhase.Decision; _canTakeover=t.Level<4; });
+                    }
                 }
                 return;
             }
@@ -498,6 +507,8 @@ namespace Marble.Core
                 default: Phase=GamePhase.Decision; break;
             }
         }
+        // Optional toll pricing rule. Standard games use the board price.
+        internal Func<int, int, long, long> TollAdjustment { get; set; }
         private void DrawChance(int depth)
         {
             int card=Next(0,10);
@@ -519,12 +530,58 @@ namespace Marble.Core
                 default: Note(GameLabels.EventCard+" · 앞으로 3칸"); MoveSteps(3); ResolveLanding(depth); break;
             }
         }
-        private void SendToIsland()
+        // Apply only from game rules after an augment or item has been validated.
+        public static string HealthDamageAction(int targetSeat, int amount) => $"system:damage:{targetSeat}:{amount}";
+        public bool ApplyHealthDamage(int targetSeat, int amount) => Execute(HealthDamageAction(targetSeat, amount));
+
+        private bool ExecuteHealthDamage(string actionId)
+        {
+            if (Phase != GamePhase.AwaitRoll && Phase != GamePhase.Decision && Phase != GamePhase.Travel)
+                return false;
+            var parts = actionId.Split(':');
+            if (parts.Length != 4 || !int.TryParse(parts[2], out int seat) || seat < 0 || seat >= Players.Count ||
+                !int.TryParse(parts[3], out int amount) || amount <= 0)
+                return false;
+            var target = Players[seat];
+            if (target.Bankrupt || target.Health == 0)
+                return false;
+
+            BeginActionMovement();
+            ReplayActions.Add(HealthDamageAction(seat, amount));
+            target.Health = Math.Max(0, target.Health - amount);
+            if (target.Health > 0)
+            {
+                Note(target.Name + " · 체력 " + target.Health + "/" + PlayerState.MaxHealth);
+                return true;
+            }
+            target.PendingTravel = false;
+            SendToIsland(target, target.Name + " · 체력 0 · 무인도행");
+            if (seat == CurrentPlayerIndex)
+                EndTurn();
+            return true;
+        }
+
+        private void LeaveIsland()
+        {
+            CurrentPlayer.IslandTurns = 0;
+            if (CurrentPlayer.Health == 0)
+                CurrentPlayer.Health = PlayerState.MaxHealth;
+        }
+
+        private void SendToIsland() => SendToIsland(CurrentPlayer);
+
+        private void SendToIsland(PlayerState target, string reason = null)
         {
             int island=Tiles.FindIndex(t=>t.Definition.Kind==TileKind.Island);
-            if(CurrentPlayer.Position!=island)RecordMovement(CurrentPlayer.Position,island,true);
-            CurrentPlayer.Position=island; CurrentPlayer.IslandTurns=3;
-            _extraRoll=false; Note(CurrentPlayer.Name+" 무인도 · 최대 3회 대기");
+            if (target.Position != island)
+            {
+                if (reason == null) RecordMovement(target.Position, island, true);
+                else actionMovement.Add(new BoardMovementStep(target.Index, target.Position, island, transfer: true, reason: reason));
+            }
+            target.Position = island;
+            target.IslandTurns = 3;
+            if (target.Index == CurrentPlayerIndex) _extraRoll = false;
+            Note(reason ?? (target.Name + " 무인도 · 최대 3회 대기"));
         }
         private void BeginPayment(long amount,int creditor,Action after)
         {

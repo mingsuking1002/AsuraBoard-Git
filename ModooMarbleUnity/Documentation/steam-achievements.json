@@ -1,0 +1,42 @@
+{
+  "purpose": "Steamworks registration reference; not an official import format",
+  "requiresDedicatedAppId": true,
+  "achievements": [
+    {
+      "apiName": "WC_FIRST_MATCH",
+      "displayName": "여행의 시작",
+      "description": "경기 결과에 처음 도달하기",
+      "reward": "구릿빛 주사위"
+    },
+    {
+      "apiName": "WC_FIRST_BUILD",
+      "displayName": "도시 설계자",
+      "description": "내 도시에 첫 건물 짓기",
+      "reward": "바다 주사위"
+    },
+    {
+      "apiName": "WC_FIRST_WIN",
+      "displayName": "첫 번째 우승",
+      "description": "한 경기에서 1위 달성하기",
+      "reward": "왕관 탐험가"
+    },
+    {
+      "apiName": "WC_THREE_LAPS",
+      "displayName": "세계 여행자",
+      "description": "한 경기에서 출발지 세 번 통과",
+      "reward": "황금 주사위"
+    },
+    {
+      "apiName": "WC_GOLDEN_REROLL",
+      "displayName": "황금빛 행운",
+      "description": "황금 리롤 한 번 사용하기",
+      "reward": "프리즘 탐험가"
+    },
+    {
+      "apiName": "WC_DICE_TARGET",
+      "displayName": "노린 한 수",
+      "description": "주사위 컨트롤 목표 합계 맞히기",
+      "reward": "프리즘 주사위"
+    }
+  ]
+}

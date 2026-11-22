@@ -18,7 +18,7 @@
 
 ## 자산
 
-사용자 보유 **FREE Starter Pack - Sidekick Modular Characters by Synty**에서 FBX 157개, PNG 팔레트 8개를 선택했다. 원본 파일 바이트의 SHA-256과 패키지 내 경로는 `asset-audit/sidekick.json`에 보존한다. `SidekickImportTools`가 정확히 이 165개만 검사한다. 패키지 에디터 스크립트·커스텀 도구는 실행하거나 가져오지 않는다.
+**FREE Starter Pack - Sidekick Modular Characters by Synty**에서 FBX 157개, PNG 팔레트 8개를 선택했다. 원본 파일 바이트의 SHA-256과 패키지 내 경로는 `asset-audit/sidekick.json`에 보존한다. `SidekickImportTools`가 정확히 이 165개만 검사한다. 패키지 에디터 스크립트·커스텀 도구는 실행하거나 가져오지 않는다.
 
 리소스: `Assets/Marble/Resources/Downloaded/Sidekick`. 조립: `SidekickAvatar`. 의상별 추가 뼈는 공통 골격에 복제해 연결하며, 각 메시의 모든 재질 슬롯에 선택한 재질을 적용한다.
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using Marble.Core;
 using Marble.Online;
 using Marble.Unity;
@@ -51,12 +52,37 @@ namespace Marble.Editor
             public string[] errors;
         }
         [Serializable] sealed class SteamBuildSettings { public uint appId; public bool developmentAppId; }
+        [Serializable] sealed class BuildFile
+        {
+            public string path;
+            public string sha256;
+        }
+        [Serializable] sealed class BuildIdentity
+        {
+            public int schema = 1;
+            public string unityVersion, gameVersion;
+            public BuildFile[] inputs, outputs;
+        }
+
+        static BuildFile[] Fingerprint(string root, params string[] directories)
+        {
+            using var sha = SHA256.Create();
+            return directories.SelectMany(dir => Directory.EnumerateFiles(Path.Combine(root, dir), "*", SearchOption.AllDirectories))
+                .Select(path => Path.GetRelativePath(root, path).Replace('\\', '/'))
+                .OrderBy(path => path, StringComparer.Ordinal)
+                .Select(path =>
+                {
+                    using var file = File.OpenRead(Path.Combine(root, path));
+                    return new BuildFile { path = path, sha256 = BitConverter.ToString(sha.ComputeHash(file)).Replace("-", "").ToLowerInvariant() };
+                }).ToArray();
+        }
 
         [MenuItem("Build/Validate and build")]
         public static void ValidateAndBuild()
         {
             string root = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
             string reportPath = Path.Combine(root, "Validation", "unity-validation.json");
+            string identityPath = Path.Combine(root, "Builds", "Windows", "build-identity.json");
             var report = new ValidationReport { status = "running", unityVersion = Application.unityVersion,
                 generatedUtc = DateTime.UtcNow.ToString("o"), scene = ScenePath,
                 executable = Path.Combine(root, OutputRelativePath), buildResult = "NotStarted", errors = new string[0] };
@@ -72,6 +98,8 @@ namespace Marble.Editor
             WriteReport(reportPath, report);
             try
             {
+                if (File.Exists(identityPath)) File.Delete(identityPath);
+                if (File.Exists(identityPath + ".tmp")) File.Delete(identityPath + ".tmp");
                 if (EditorApplication.isCompiling || EditorApplication.isUpdating)
                     throw new InvalidOperationException("Editor must finish compilation/import before validation.");
                 report.coreTestsPassed = CoreSelfTests.Run();
@@ -104,6 +132,8 @@ namespace Marble.Editor
                 AssetDatabase.SaveAssets();
                 EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };
                 Directory.CreateDirectory(Path.GetDirectoryName(report.executable));
+                string[] inputDirectories = { "Assets", "Packages", "ProjectSettings" };
+                var inputs = Fingerprint(root, inputDirectories);
                 var built = BuildPipeline.BuildPlayer(new BuildPlayerOptions
                 {
                     scenes = new[] { ScenePath },
@@ -121,6 +151,18 @@ namespace Marble.Editor
                     throw new InvalidOperationException("Windows build failed: " + built.summary.result);
                 if (errors.Count > 0)
                     throw new InvalidOperationException("Validation/build logged " + errors.Count + " errors.");
+                var after = Fingerprint(root, inputDirectories);
+                if (!inputs.Select(f => (f.path, f.sha256)).SequenceEqual(after.Select(f => (f.path, f.sha256))))
+                    throw new InvalidOperationException("Build inputs changed during the build. Run the build again.");
+                var identity = new BuildIdentity
+                {
+                    unityVersion = Application.unityVersion,
+                    gameVersion = PlayerSettings.bundleVersion,
+                    inputs = inputs,
+                    outputs = Fingerprint(root, "Builds/Windows")
+                };
+                File.WriteAllText(identityPath + ".tmp", JsonUtility.ToJson(identity, true));
+                File.Move(identityPath + ".tmp", identityPath);
                 report.status = "passed";
                 report.errors = errors.ToArray();
                 WriteReport(reportPath, report);
@@ -206,7 +248,7 @@ namespace Marble.Editor
         {
             PlayerSettings.companyName = "CircuitWorkshop";
             PlayerSettings.productName = "World Circuit";
-            PlayerSettings.bundleVersion = "0.19.0";
+            PlayerSettings.bundleVersion = "0.19.1";
             PlayerSettings.defaultScreenWidth = 1440;
             PlayerSettings.defaultScreenHeight = 900;
             PlayerSettings.fullScreenMode = FullScreenMode.Windowed;

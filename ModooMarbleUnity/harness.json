@@ -14,7 +14,29 @@
   ],
   "reports": "Validation/harness-runs",
   "wikiHistory": "Documentation/wiki/history.md",
+  "buildGuard": "Tools/check_build_identity.py",
+  "buildIdentity": "Builds/Windows/build-identity.json",
+  "features": {
+    "movement": {"checks": ["source", "dice"]},
+    "health": {"checks": ["source"], "dependsOn": ["movement"]},
+    "replay-online": {"checks": ["source", "front"], "dependsOn": ["health", "movement"]},
+    "match-loop": {"checks": ["source", "loop"], "dependsOn": ["health", "movement"]},
+    "hud": {"checks": ["front"], "dependsOn": ["health", "movement", "match-loop"]},
+    "content": {"checks": ["data", "source"]},
+    "balance": {"checks": ["balance"], "dependsOn": ["health", "movement"]},
+    "build": {"checks": ["data", "build-id", "source", "front", "loop", "dice"]}
+  },
   "checks": {
+    "balance": {
+      "command": ["{python}", "-X", "utf8", "Tools/Balance/run.py", "--games", "200", "--out", "{out}"],
+      "timeout": 180
+    },
+    "data": {
+      "command": ["{python}", "-X", "utf8", "Tools/check_game_data.py"]
+    },
+    "build-id": {
+      "command": ["{python}", "-X", "utf8", "Tools/check_build_identity.py"]
+    },
     "wiki": {
       "command": ["python", "-X", "utf8", "Tools/update_wiki.py"]
     },
@@ -28,6 +50,7 @@
       ]
     },
     "front": {
+      "requiresCurrentBuild": true,
       "command": [
         "Builds/Windows/ModooMarbleClassic.exe",
         "-marble-front-check",
@@ -48,6 +71,7 @@
       "result": "runtime-validation.json"
     },
     "loop": {
+      "requiresCurrentBuild": true,
       "command": [
         "Builds/Windows/ModooMarbleClassic.exe",
         "-marble-loop-preview",
@@ -68,6 +92,7 @@
       "result": "loop.json"
     },
     "dice": {
+      "requiresCurrentBuild": true,
       "command": [
         "Builds/Windows/ModooMarbleClassic.exe",
         "-marble-dice-check",

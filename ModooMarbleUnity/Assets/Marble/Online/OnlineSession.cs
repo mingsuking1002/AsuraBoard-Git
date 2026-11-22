@@ -158,6 +158,19 @@ namespace Marble.Online
             var packet=Packet(PacketKind.Commit);packet.Sequence=Model.ReplayActions.Count;packet.Action="system:augment";packet.Hash=OnlineProtocol.StateHash(Model);
             Broadcast(packet);ActionCommitted?.Invoke(packet.Action);return true;
         }
+        // Host game rules call this after validating the effect; client requests cannot submit system actions.
+        public bool ApplyHealthDamage(int targetSeat, int amount)
+        {
+            if (!IsHost || Stage != OnlineStage.Playing || Model == null || !Model.ApplyHealthDamage(targetSeat, amount))
+                return false;
+            var packet = Packet(PacketKind.Commit);
+            packet.Sequence = Model.ReplayActions.Count;
+            packet.Action = Game.HealthDamageAction(targetSeat, amount);
+            packet.Hash = OnlineProtocol.StateHash(Model);
+            Broadcast(packet);
+            ActionCommitted?.Invoke(packet.Action);
+            return true;
+        }
         void Received(ulong sender,byte[] bytes)
         {
             if(boundRoom==0 || Stage==OnlineStage.Faulted || !service.Members.Any(p=>p.Id==sender))return;

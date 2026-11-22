@@ -339,6 +339,15 @@ namespace Marble.Unity
             while(brightMoney.fontSize>14 && brightMoney.CalcSize(new GUIContent(cashText)).x>153)brightMoney.fontSize--;
             GUI.Label(new Rect(x+136,y+42,153,35),cashText,brightMoney);
             GUI.Label(new Rect(x+136,y+79,153,24),(p.CreditDueRound>0?p.CreditDueRound+"R 만기 · ":"총자산 ")+Money(p.CreditDueRound>0?-p.Cash:Model.GetNetWorth(i)),brightSmall);
+            if (!p.Bankrupt)
+            {
+                var healthBar = new Rect(x+136,y+109,62,6);
+                CircuitArt.Fill(healthBar,PaperTheme.Wash(c,.3f));
+                if (p.Health > 0)
+                    CircuitArt.Fill(new Rect(healthBar.x,healthBar.y,healthBar.width*p.Health/PlayerState.MaxHealth,healthBar.height),
+                        p.Health <= 25 ? PaperTheme.Coral : PaperTheme.Forest);
+                GUI.Label(new Rect(x+204,y+100,85,22),$"체력 {p.Health}/{PlayerState.MaxHealth}",brightSmall);
+            }
             GUI.Label(new Rect(x+70,y+119,218,23),p.Bankrupt?"게임 종료":
                 Model.Tiles[p.Position].Definition.Name+"  ·  "+p.Laps+"바퀴"+(p.IslandTurns>0?"  ·  무인도":p.PendingTravel?"  ·  여행 대기":active?"  ◀ 현재 차례":""),brightSmall);
         }
@@ -613,6 +622,22 @@ namespace Marble.Unity
             }
             catch (Exception ex) { Toast("저장 실패: " + ex.Message); Debug.LogException(ex); }
         }
+        static Game DecodeSave(string json)
+        {
+            var data = JsonUtility.FromJson<SaveData>(json);
+            if (data == null || (data.Version < 1 || data.Version > 6) || data.Config == null || data.Actions == null || data.Actions.Length > 100000) throw new InvalidDataException("잘못된 저장 형식");
+            var restored = new Game(data.Config);
+            if(data.Version>=3)
+            {
+                int count=restored.Players.Count;
+                if(data.Names==null || data.Avatars==null || data.Colors==null || data.Names.Length!=count || data.Avatars.Length!=count || data.Colors.Length!=count || data.Avatars.Any(v=>v<0 || v>=CosmeticCatalog.AvatarCount) || data.Colors.Any(v=>v<0 || v>3))throw new InvalidDataException("잘못된 외형 정보");
+                if(data.Version>=4 && (data.DiceSkins==null || data.DiceSkins.Length!=count || data.DiceSkins.Any(v=>v<0 || v>=CosmeticCatalog.DiceSkinCount)))throw new InvalidDataException("잘못된 주사위 외형");
+                if(data.Version>=6 && (data.Outfits==null || data.Outfits.Length!=count || data.Outfits.Any(v=>!WardrobeCatalog.IsValid(v))))throw new InvalidDataException("잘못된 옷장 정보");
+                for(int i=0;i<count;i++){restored.Players[i].Outfit=data.Version>=6?data.Outfits[i]:WardrobeCatalog.DefaultCode;restored.Players[i].DiceSkin=data.Version>=4?data.DiceSkins[i]:0;restored.Players[i].Name=Marble.Online.OnlineProtocol.CleanName(data.Names[i]);restored.Players[i].Avatar=data.Avatars[i];restored.Players[i].ColorIndex=data.Colors[i];}
+            }
+            foreach (var action in data.Actions) if (!restored.Execute(action)) throw new InvalidDataException("재현할 수 없는 행동");
+            return restored;
+        }
         void Load()
         {
             if(OnlineRoom){Toast("온라인 방에서는 로컬 저장을 불러올 수 없습니다.");return;}
@@ -620,18 +645,7 @@ namespace Marble.Unity
             {
                 if (!File.Exists(SavePath)) { Toast("저장된 게임이 없습니다"); return; }
                 if (new FileInfo(SavePath).Length > 8 * 1024 * 1024) throw new InvalidDataException("저장 파일 크기 초과");
-                var data = JsonUtility.FromJson<SaveData>(File.ReadAllText(SavePath));
-                if (data == null || (data.Version < 1 || data.Version > 6) || data.Config == null || data.Actions == null || data.Actions.Length > 100000) throw new InvalidDataException("잘못된 저장 형식");
-                var restored = new Game(data.Config);
-                if(data.Version>=3)
-                {
-                    int count=restored.Players.Count;
-                    if(data.Names==null || data.Avatars==null || data.Colors==null || data.Names.Length!=count || data.Avatars.Length!=count || data.Colors.Length!=count || data.Avatars.Any(v=>v<0 || v>=CosmeticCatalog.AvatarCount) || data.Colors.Any(v=>v<0 || v>3))throw new InvalidDataException("잘못된 외형 정보");
-                    if(data.Version>=4 && (data.DiceSkins==null || data.DiceSkins.Length!=count || data.DiceSkins.Any(v=>v<0 || v>=CosmeticCatalog.DiceSkinCount)))throw new InvalidDataException("잘못된 주사위 외형");
-                    if(data.Version>=6 && (data.Outfits==null || data.Outfits.Length!=count || data.Outfits.Any(v=>!WardrobeCatalog.IsValid(v))))throw new InvalidDataException("잘못된 옷장 정보");
-                    for(int i=0;i<count;i++){restored.Players[i].Outfit=data.Version>=6?data.Outfits[i]:WardrobeCatalog.DefaultCode;restored.Players[i].DiceSkin=data.Version>=4?data.DiceSkins[i]:0;restored.Players[i].Name=Marble.Online.OnlineProtocol.CleanName(data.Names[i]);restored.Players[i].Avatar=data.Avatars[i];restored.Players[i].ColorIndex=data.Colors[i];}
-                }
-                foreach (var action in data.Actions) if (!restored.Execute(action)) throw new InvalidDataException("재현할 수 없는 행동");
+                var restored = DecodeSave(File.ReadAllText(SavePath));
                 InstallModel(restored);autoHuman=false;
                 if(!diagnosticMode)
                 {

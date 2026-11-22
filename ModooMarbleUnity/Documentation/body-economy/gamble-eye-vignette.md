@@ -1,6 +1,6 @@
 # 겜블 눈 매각 시야 효과 재확인
 
-2026-10-27, 사용자가 지정한 Gamble With Your Friends 설치본의 `Assembly-CSharp.dll`을 REA로 읽었다. 게임을 실행하거나 설치본을 변경하지 않았다.
+2026-10-27, Gamble With Your Friends 설치본의 `Assembly-CSharp.dll`을 정적으로 분석했다. 게임을 실행하거나 설치본을 변경하지 않았다.
 
 ## 확인한 동작
 
@@ -26,4 +26,4 @@
 - UpdateVignette 토큰: `0x06001669`, raw CIL SHA-256: `8afbfa258cd28ec7d38dbedaf8c56e97f6a545b9c467a7827fec4350bc723b46`
 - 저장된 전체 관련 IL: [gamble-organs-il.txt](gamble-organs-il.txt), PlayerEyesUI 422행 이후. 이번 REA의 상수·분기와 일치한다.
 
-우리 0.14.1의 약한 전체 월드 블러는 기존 기획서의 블러 요구를 따른 구현이었다. 이후 사용자 요청에 따라 0.14.2에서 좌우 시야 가림으로 교체했다. 중심 이동 방식은 이 조사 결과를 참고했으며 마스크의 경계와 강도는 직접 구현한 값이다. [구현과 실행 검증](../unity-vignette-runtime.md).
+0.14.1의 전체 화면 블러는 0.14.2에서 좌우 시야 가림으로 교체했다. 중심 이동 방식은 이 조사 결과를 참고했으며 마스크의 경계와 강도는 직접 구현한 값이다. [구현과 실행 검증](../unity-vignette-runtime.md).

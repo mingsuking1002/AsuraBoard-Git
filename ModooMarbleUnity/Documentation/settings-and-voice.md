@@ -1,6 +1,6 @@
-﻿# 환경설정과 Steam 방 음성
+# 환경설정과 Steam 방 음성
 
-0.12.0 소스. 사용자가 눌러서 말하기와 항상 열림 마이크를 요청한 범위로 추가했다. 이번 작업에서 게임·마이크를 실행하거나 실제 음성을 수집·전송하지 않았다.
+0.12.0에서 눌러서 말하기와 항상 열림을 추가했다. 실제 음성 검증은 별도로 진행한다.
 
 ## 사용하는 곳
 
@@ -47,7 +47,7 @@ Steam의 기본 마이크 입력과 Unity의 기본 재생 출력을 사용한�
 
 ### Gamble With Your Friends
 
-사용자가 지정한 설치본 Assembly-CSharp.dll의 선택 CIL을 조사했다. 실행 검증은 하지 않았다. 파일 SHA-256은 f2147868930f1fc9df3489ef89339759f7eeb8a92c270bec094a4ece6dd2935b, MVID는 d531044a-de62-4d57-85e9-3914d8e9adc0다.
+참고 설치본 Assembly-CSharp.dll의 선택 CIL을 조사했다. 실행 검증은 하지 않았다. 파일 SHA-256은 f2147868930f1fc9df3489ef89339759f7eeb8a92c270bec094a4ece6dd2935b, MVID는 d531044a-de62-4d57-85e9-3914d8e9adc0다.
 
 - DisplaySettingsApplier.Apply: 해상도·화면 모드·주사율을 Screen.SetResolution으로 적용.
 - FramerateSettingsApplier.Apply: FPS를 Application.targetFrameRate로 적용. VSync는 QualitySettings.vSyncCount에 연결.
@@ -63,7 +63,7 @@ REA 근거: ev_cc6648c6c7797b8dca77d7d4e497bac968042e306e2464872459b45d135982e0.
 
 ### MECCHA CHAMELEON
 
-사용자가 지정했던 설치본의 Manifest_UFSFiles_Win64.txt에서 설정 자산 경로를 확인했다. WBP_ConfigSound, WBP_ConfigGraphic, WBP_ConfigGameGeneral, WBP_ComboBox_ScreenMode, WBP_SettingSliderFPS, WBP_PerformaiceMode, 음성 입력/출력 장치, VoiceChatUserSettings와 VoiceChatLists가 포함된다. 경로 존재만으로 실제 동작·기본값까지 확인했다고 표현하지 않았다.
+참고 설치본의 Manifest_UFSFiles_Win64.txt에서 설정 자산 경로를 확인했다. WBP_ConfigSound, WBP_ConfigGraphic, WBP_ConfigGameGeneral, WBP_ComboBox_ScreenMode, WBP_SettingSliderFPS, WBP_PerformaiceMode, 음성 입력/출력 장치, VoiceChatUserSettings와 VoiceChatLists가 포함된다. 경로 존재만으로 실제 동작·기본값까지 확인했다고 표현하지 않았다.
 
 ### 리그 오브 레전드
 

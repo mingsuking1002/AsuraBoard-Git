@@ -16,3 +16,5 @@ __pycache__/
 *.sln
 *.slnx
 .vs/
+/Validation/Balance/
+/Validation/BalanceReplay/
