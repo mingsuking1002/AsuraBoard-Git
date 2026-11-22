@@ -143,7 +143,7 @@ namespace Marble.Online
             {Report("방 입장 실패. 초대 권한·빈자리·방 상태를 확인해 주세요. ("+p.m_EChatRoomEnterResponse+")");return;}
             var id=new CSteamID(p.m_ulSteamIDLobby);
             if(!Compatible(id) || SteamMatchmaking.GetLobbyData(id,"state")!="lobby" || SteamMatchmaking.GetLobbyMemberLimit(id)>4)
-            {SteamMatchmaking.LeaveLobby(id);Report("이 빌드와 호환되는 모마 대기실이 아닙니다.");return;}
+            {SteamMatchmaking.LeaveLobby(id);Report("이 빌드와 호환되는 아수라판 대기실이 아닙니다.");return;}
             BindRoom(id);Status="방에 입장했습니다.";
         }
         bool Compatible(CSteamID id)=>SteamMatchmaking.GetLobbyData(id,"game")==OnlineProtocol.GameKey && SteamMatchmaking.GetLobbyData(id,"compat")==OnlineProtocol.Compatibility;
@@ -151,7 +151,7 @@ namespace Marble.Online
         {
             RoomId=id.m_SteamID;RefreshMembers(true);
             SteamFriends.SetRichPresence("connect","+connect_lobby "+RoomId);
-            SteamFriends.SetRichPresence("status","모마 대기실");
+            SteamFriends.SetRichPresence("status","아수라판 대기실");
         }
         void RefreshMembers(bool force)
         {
@@ -177,7 +177,7 @@ namespace Marble.Online
             var id=new CSteamID(RoomId);
             if(!SteamMatchmaking.SetLobbyJoinable(id,value) || !SteamMatchmaking.SetLobbyData(id,"state",value?"lobby":"playing"))
                 Report("방 입장 설정을 변경하지 못했습니다.");
-            SteamFriends.SetRichPresence("status",value?"모마 대기실":"모마 온라인 경기");
+            SteamFriends.SetRichPresence("status",value?"아수라판 대기실":"아수라판 온라인 경기");
         }
         public void OpenInviteOverlay()
         {

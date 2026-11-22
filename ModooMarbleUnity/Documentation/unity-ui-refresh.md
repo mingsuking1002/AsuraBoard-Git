@@ -1,6 +1,6 @@
 # 종이 보드 UI 개선
 
-기존에 조사한 [Machine Party](ui-ux/reference-analysis/party-ui-ux.md), [Gamble With Your Friends](ui-ux/reference-analysis/gamble-ui-ux.md), [Goose Goose Duck](ui-ux/reference-analysis/goose-ui-ux-report.md)과 [모두의마블 게임 안내](https://modoo.netmarble.net/Guide/Guide.asp)를 참고해 우리 게임의 화면 흐름과 정보 우선순위를 정리했다. 설치본의 정적 분석은 실제 화면의 정확한 색상이나 배치를 입증하지 않는다. 다른 게임의 그림이나 UI 에셋을 가져오지 않았다.
+로비에서는 참가자와 방 설정을, 경기에서는 현재 차례와 보드 상태를 우선 표시한다.
 
 - 공통 버튼: 주 행동의 짙은 초록색, 보조 행동의 밝은 종이색, 비활성·마우스 오버·키보드 포커스 표시.
 - 메인과 방: 보드 일러스트, 내 캐릭터 바로가기, 연결 상태, 방 생성·탐색과 초대 경로를 정리했다.

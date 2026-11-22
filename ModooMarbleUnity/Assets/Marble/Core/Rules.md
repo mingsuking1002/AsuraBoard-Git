@@ -6,7 +6,7 @@ The current renderer uses independently authored procedural artwork and does not
 
 ## Evidence adopted
 
-The board uses the 32 names/order, eight city groups and five resort locations extracted from APK `RgnInfo0.dat` and `ADD_ALL`. See `Documentation/apk/findings.md` and `C:/Users/ksh00/project/MarbleResearchArchive/removed-game-art-20261025/Assets/StreamingAssets/original-map.json` for source offsets, raw values and limitations. Map0 has a bonus game and no tax tile.
+The board has 32 tiles, eight city groups, five resorts and one bonus game.
 
 Packaged guide labels establish: built color sets double toll; three completed color sets, a whole line, or every resort win; island escape can use a double, payment or a card; landmarks prevent takeover; start allows owned-city additional construction; world-travel destination is selected next turn; bonus-game success returns double the entry fee; emergency loans and selling property address cash shortage. Blue-resort owned-count and pink-resort arrival rules are described in labels. Mapping raw resort types to those descriptions remains an inference.
 
@@ -32,7 +32,7 @@ Packaged guide labels establish: built color sets double toll; three completed c
 
 All default numeric economy values, additional construction sequencing choices, exact partial-building toll stacking, double exceptions, island timing/fines, travel fee/salary behavior, Olympics accumulation/cap, fortune deck/probabilities, emergency-loan terms, liquidation values, landmark owner-liquidation restriction, bankruptcy property transfer, inclusion of resorts in line wins and turn-limit tie-breaking are reconstruction choices awaiting code/runtime corroboration. The guide's forced-sale protection does not by itself prohibit an owner's voluntary sale; the current debt UI conservatively does not offer landmark liquidation.
 
-Prices are intentionally not claimed to be original. APK raw financial arrays are retained but their column semantics and cumulative/incremental structure have not been code-verified. The engine's board constructor accepts a `TileDefinition[32]` override so verified economics can replace the defaults without changing game flow.
+The board constructor accepts a TileDefinition[32] override for alternative economics.
 
 ## API and deterministic replay
 

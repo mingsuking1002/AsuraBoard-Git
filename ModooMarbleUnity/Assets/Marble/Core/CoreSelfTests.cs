@@ -21,7 +21,7 @@ namespace Marble.Core
         private static void BoardIntegrity()
         {
             var g=New(); Assert(g.Tiles.Count==32,"32 tiles");
-            Assert(g.Tiles[2].Definition.Kind==TileKind.Bonus && g.Tiles[31].Definition.Name=="서울","APK topology");
+            Assert(g.Tiles[2].Definition.Kind==TileKind.Bonus && g.Tiles[31].Definition.Name=="서울","board topology");
             Assert(g.Tiles.Count(t=>t.Definition.Kind==TileKind.Resort)==5,"five resorts");
             Assert(g.Players.All(p=>p.Cash==2000),"equal starting cash");
         }

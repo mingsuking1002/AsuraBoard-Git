@@ -4,7 +4,7 @@
 
 개발을 이어받을 때는 [프로젝트 작업 규칙](AGENTS.md)과 [현재 인수인계](HANDOFF.md)를 읽고 [공통 하네스](../GameHarness/README.md)로 검증합니다.
 
-Unity 6000.3.9f1으로 만든 거래와 빚, 반전이 있는 파티 보드게임입니다. 원본 게임에서 추출한 그래픽·캐릭터·주사위 모델·UI 스킨·폰트를 제거하고 직접 만든 비주얼로 교체했습니다. Synty POLYGON Starter Pack의 바닥판과 Sidekick Starter Pack의 모듈형 캐릭터를 사용합니다. 기본 규칙 엔진과 Steam 멀티는 유지합니다.
+Unity 6000.3.9f1으로 만든 거래와 빚, 반전이 있는 파티 보드게임입니다. Synty POLYGON Starter Pack의 바닥판과 Sidekick Starter Pack의 모듈형 캐릭터를 사용합니다. 기본 규칙 엔진과 Steam 멀티는 유지합니다.
 
 ## 특수능력 기능 팩 30종 (소스)
 
@@ -121,4 +121,4 @@ Unity 6000.3.9f1으로 만든 거래와 빚, 반전이 있는 파티 보드게�
 
 기본 맵의 도시명·순서와 조사한 규칙은 남아 있습니다. 금액·카드·세부 예외는 재구성 선택을 포함하며, 모든 원본 서버 규칙을 복원했다는 뜻은 아닙니다. [규칙](Assets/Marble/Core/Rules.md).
 
-`Documentation`의 기존 APK·능력 조사 자료는 과거 조사 기록이며 현재 게임의 그래픽 자산이 아닙니다. 제거한 플레이용 자산은 Unity 프로젝트 바깥의 `C:/Users/ksh00/project/MarbleResearchArchive/removed-game-art-20261025`에 보관했습니다. 추출 도구로 원본 그래픽을 다시 넣으면 현재 자산 검사에서 실패합니다. Unity와 Steamworks.NET 같은 실행·연결 의존성은 유지합니다. Steam 업로드·스토어 출시는 하지 않았습니다.
+플레이용 에셋은 빌드 검사에서 검증한다. Steam 업로드와 스토어 출시는 진행 전이다.

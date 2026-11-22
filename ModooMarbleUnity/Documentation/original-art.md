@@ -1,6 +1,6 @@
 # 직접 제작 비주얼 전환
 
-현재 변경: POLYGON Starter Pack의 1×1 바닥판, Sidekick Starter Pack의 캐릭터, Simple Town Lite의 아파트 모델과 텍스처를 사용한다. 원본 게임 추출 아트의 제외 정책은 유지하며, 바닥 FBX 한 개, Sidekick FBX 157개·팔레트 PNG 8개, Simple Town FBX와 PNG 각 한 개를 경로와 SHA-256으로 검증해 허용한다. 패키지의 에디터 실행 코드는 가져오지 않았다. [현재 폴리싱과 검증](release-polish-018.md), [옷장 구현](unity-wardrobe.md), [바닥판 기록](unity-synty-floor.md). 아래는 최초 직접 제작 전환 당시의 기록이다.
+현재 변경: POLYGON Starter Pack의 1×1 바닥판, Sidekick Starter Pack의 캐릭터, Simple Town Lite의 아파트 모델과 텍스처를 사용한다. 바닥 FBX 한 개, Sidekick FBX 157개·팔레트 PNG 8개, Simple Town FBX와 PNG 각 한 개를 경로와 SHA-256으로 검증해 허용한다. 패키지의 에디터 실행 코드는 가져오지 않았다. [현재 폴리싱과 검증](release-polish-018.md), [옷장 구현](unity-wardrobe.md), [바닥판 기록](unity-synty-floor.md). 아래는 최초 직접 제작 전환 당시의 기록이다.
 
 2026-10-25. 기존 그래픽을 제거하고 새 디자인을 코드로 구현했다.
 
@@ -14,10 +14,6 @@
 | UI | 새 팔레트·버튼·팝업·카드·선택 표시. 텍스처는 런타임에 원과 버튼 모양만 생성 |
 | 소리 | 사인파 기반 짧은 클릭·이동음 직접 합성 |
 | 한글 | 시스템 맑은 고딕 사용. 폰트 파일 배포 없음 |
-
-`Assets/Marble/Resources/OriginalUI` 전체와 `MarbleKorean.ttf`, 원본 좌표/메시 데이터의 런타임 사용을 제거했다. 원본 배경·캐릭터·타일·스킨·주사위 이미지와 애니메이션 타임라인에 접근하는 코드가 없다. 플레이용 `original-map.json`도 제거했다. 도시명과 순서·규칙 데이터는 엔진에 유지한다.
-
-참고 게임의 리소스는 프로젝트 외부 아카이브에 보관한다. 과거 조사 보고서·비교 스크린샷은 조사 기록으로만 남고 빌드에 들어가지 않는다.
 
 현재 자산 검사는 Assets의 이미지·모델·음원·폰트 파일 및 원본 리소스 폴더가 다시 들어오면 빌드를 중단한다. 32칸의 유일성·인접 순서·화면 범위·칸별 클릭 영역도 검사한다. 향후 직접 만든 파일형 자산을 추가할 때는 이 검사를 해당 자산의 출처 검증 방식으로 변경해야 한다.
 

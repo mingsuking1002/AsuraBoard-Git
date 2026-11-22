@@ -1,0 +1,10 @@
+name: Public tree
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/check_public_tree.py

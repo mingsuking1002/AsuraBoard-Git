@@ -1,6 +1,24 @@
-# 아수라판
+# 아수라판 | AI와 함께 만든 Unity 보드게임
 
-아수라판은 도시 투자, 통행료, 신체 경제와 증강을 다루는 2~4인 Unity 보드게임이다. 같은 C# 규칙 엔진으로 게임을 플레이하고 화면 없는 자동 경기를 실행한다.
+통행료를 내야 하는데 현금이 부족하다. 오른눈을 팔면 400G를 받을 수 있다. 다음 주사위를 굴릴 때, 보드 오른쪽을 읽기 어려워져도 지금 파는 게 이득일까?
+
+**[1분 플레이 영상 보기 (MP4)](https://raw.githubusercontent.com/mingsuking1002/AsuraBoard-Git/main/docs/media/asura-gameplay.mp4)** · [밸런스 실험과 샘플](https://github.com/mingsuking1002/Asura-Balance) · [게임 개발 하네스](https://github.com/mingsuking1002/GameHarness)
+
+앞 24초는 Windows 빌드의 4인 자동 경기다. 이어지는 장면은 시야 조건을 고정한 Unity 검증 캡처로, 매각 전·후와 복구 상태를 비교한다.
+
+## 오른눈 하나의 값
+
+![오른눈 매각 후의 초기 화면과 개선 화면. 개선 버전에서는 보드의 오른쪽 가장자리부터 어두워진다.](docs/media/right-eye-comparison.jpg)
+
+초기 버전을 플레이했을 때 한쪽 눈을 파는 선택이 보드 전체를 읽는 데 부담을 줬다. 어느 쪽 눈을 팔았는지 화면에서 바로 알아보고, 남은 시야로 다음 수를 정할 수 있도록 효과를 바꿨다.
+
+- **한쪽 눈**을 팔면 해당 방향으로 갈수록 어두워진다. 현금과 턴 정보는 계속 읽을 수 있다.
+- **양쪽 눈**을 팔면 말 주변에 시야가 남는다. 말을 따라 시야가 움직여 바로 옆 타일은 볼 수 있다.
+- 오른눈의 기본 복구가는 **600G**다. 지금 400G를 마련하는 선택이 이후의 지출로 이어진다.
+
+같은 조건에서 방향별 밝기, 이동 중 시야 중심, 복구 후 화면, 다른 플레이어 화면을 확인한다. [경제 규칙](ModooMarbleUnity/Assets/Marble/Core/GameBodyEconomy.cs) · [Unity 시야 검사](ModooMarbleUnity/Assets/Marble/Runtime/MarbleVisionRuntimeCheck.cs)
+
+## 게임을 만들고 검증하는 방법
 
 | 구성 | 내용 |
 |---|---|

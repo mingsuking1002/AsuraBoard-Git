@@ -1,6 +1,6 @@
 # Steam 출시 준비 상태
 
-현재는 플레이 가능한 개발 빌드이며 Steam 출시 완료나 Valve 심사를 통과한 빌드가 아니다. 원본 게임을 조사한 참고 자료는 빌드 아트로 넣지 않고, 보드 기능·정보 배치만 참고해 라이선스 에셋과 자체 비주얼을 사용한다. 참고한 자료: [넷마블 공식 게임 소개](https://m.netmarble.net/smart/game/momak), [모두의마블 보드와 플레이어 정보 가이드](https://c2.img.netmarble.kr/web/board/moma/v/html/guide/iframe/guide3.html?dm=game2.netmarble.net), [Pummel Party Steam 소개](https://store.steampowered.com/app/880940/Pummel_Party/).
+현재는 플레이 가능한 개발 빌드다. Steam 출시와 Valve 심사는 진행 전이다.
 
 ## 출시 전 필요한 것
 

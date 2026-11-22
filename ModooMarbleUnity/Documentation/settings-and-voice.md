@@ -57,10 +57,6 @@ Steam의 기본 마이크 입력과 Unity의 기본 재생 출력을 사용한�
 
 REA 근거: ev_cc6648c6c7797b8dca77d7d4e497bac968042e306e2464872459b45d135982e0. 원본의 VoiceActivation은 음성 활성화 방식이며 우리 항상 열림과 같은 동작으로 단정하지 않았다. Dissonance·FMOD 코드나 음원을 프로젝트에 복사하지 않았다.
 
-### 모두의마블
-
-기존 제공 APK 10.9.02의 ADD_ALL 원문에서 s1046 배경음악, s1047 효과음, s2044 절전모드, s2045 초대거부, s2049 절전 설명, s2050 친구 실시간 초대 거부 설명을 확인했다. 문자열 근거이며 현재 서비스의 실제 설정 동작을 검증한 것은 아니다.
-
 ### MECCHA CHAMELEON
 
 참고 설치본의 Manifest_UFSFiles_Win64.txt에서 설정 자산 경로를 확인했다. WBP_ConfigSound, WBP_ConfigGraphic, WBP_ConfigGameGeneral, WBP_ComboBox_ScreenMode, WBP_SettingSliderFPS, WBP_PerformaiceMode, 음성 입력/출력 장치, VoiceChatUserSettings와 VoiceChatLists가 포함된다. 경로 존재만으로 실제 동작·기본값까지 확인했다고 표현하지 않았다.

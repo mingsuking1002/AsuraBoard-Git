@@ -1,0 +1,25 @@
+# Local research inputs and working tools
+*.apk
+*.xapk
+MarbleResearchArchive/
+modoo-marble-analysis/
+rea-setup-*/
+**/Documentation/apk/
+**/Documentation/research/
+**/Documentation/abilities/
+**/Tools/AbilityCatalog/
+original-map.json
+RgnInfo*.dat
+ADD_ALL
+**/Tools/extract_*.py
+**/Tools/inspect_ability*.py
+ModooMarbleUnity/Tools/build_effect_overview.py
+ModooMarbleUnity/Tools/check_ability_catalog.js
+ModooMarbleUnity/Tools/decode_f3spr.py
+ModooMarbleUnity/Tools/extract_abilities.py
+ModooMarbleUnity/Tools/extract_apk_map.py
+ModooMarbleUnity/Tools/extract_dice.py
+ModooMarbleUnity/Tools/inspect_ability_mechanics.py
+ModooMarbleUnity/Tools/inspect_ability_supporting_assets.py
+ModooMarbleUnity/Tools/reconcile_board.py
+ModooMarbleUnity/Tools/validate_ability_research.py

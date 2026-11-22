@@ -222,7 +222,7 @@ namespace Marble.Unity
             var report=new SteamProbe{appId=steamAppId,initialized=steamRooms.Available,status="unavailable",message=steamRooms.Status};
             if(steamRooms.Available)
             {
-                steamRooms.CreateRoom("모마 연결 검사",2,RoomPrivacy.Private);
+                steamRooms.CreateRoom("아수라판 연결 검사",2,RoomPrivacy.Private);
                 float until=Time.realtimeSinceStartup+22;
                 while(steamRooms.Busy && Time.realtimeSinceStartup<until)yield return null;
                 if(int.TryParse(Arg(args,"-marble-steam-augment-count"),out int requestedCount))onlineSession.SetAugmentCount(requestedCount);
