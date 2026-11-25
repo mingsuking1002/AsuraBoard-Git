@@ -39,7 +39,7 @@
 
 ## 2026-11-19 · 개발 도구 교대
 
-Antigravity에서 pwsh를 찾지 못해 doctor가 실패했다. 소스 검사를 Windows PowerShell 5.1로 전환한 뒤 Codex에서 소스 검사와 컴파일이 통과했고 Antigravity에서 doctor 통과를 확인했다. 증거는 Validation/harness-runs/20261119T144423Z-source-a8b60f7d/report.json이다.
+PowerShell 7이 설치되지 않은 환경에서 doctor가 실패했다. 소스 검사를 Windows PowerShell 5.1로 전환한 뒤 환경 검사, 소스 검사와 컴파일이 통과했다. 증거는 Validation/harness-runs/20261119T144423Z-source-a8b60f7d/report.json이다.
 
 ## 2026-10-30 · Windows 0.19.0
 

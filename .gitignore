@@ -1,4 +1,10 @@
 # Local research inputs and working tools
+/ModooMarbleUnity/.agents/
+/ModooMarbleUnity/.codex/
+/ModooMarbleUnity/Tools/handoff_hook.py
+/ModooMarbleUnity/Tools/InspectGambleManaged.cs
+/ModooMarbleUnity/Tools/UiFramework/browser-check.cjs
+/ModooMarbleUnity/Documentation/body-economy/gamble-*
 *.apk
 *.xapk
 MarbleResearchArchive/

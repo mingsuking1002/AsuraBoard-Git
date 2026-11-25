@@ -15,7 +15,12 @@ def main():
     if ignored.returncode not in (0, 1):
         return ignored.returncode
     # Use filenames only so diagnostics do not reproduce private material.
-    markers = r"MarbleResearchArchive|RgnInfo[0-9]+\.dat|netmarble\.(net|kr)|모두의 *마블|mcp__rea|splus-items|ADD_ALL|모마"
+    markers = (
+        r"MarbleResearchArchive|RgnInfo[0-9]+\.dat|netmarble\.(net|kr)|모두의 *마블|"
+        r"mcp__rea|splus-items|ADD_ALL|모마|gamble-eye-vignette|gamble-organs-il|"
+        r"Gamble With Your Friends.*Assembly-CSharp|\b(antigravity|codex)\b|"
+        r"[A-Za-z]:[/\\]Users[/\\]ksh00([/\\]|$)|자동 승인 검토|사용자 명시 요청"
+    )
     matches = git("grep", "--cached", "-IlizE", markers, "--", ".",
                   ":(exclude)tools/check_public_tree.py", ":(exclude).gitignore")
     if matches.returncode not in (0, 1):

@@ -43,32 +43,6 @@ Steam의 기본 마이크 입력과 Unity의 기본 재생 출력을 사용한�
 
 초대 자동 입장 거부를 켜도 방 찾기·방 ID를 통한 직접 입장은 가능하다. 현재 게임에 실제 배경음악 트랙, FPS 시점 카메라, HDR·필름 그레인 조절이 없어 그 항목들은 추가하지 않았다.
 
-## 참고 게임 조사
-
-### Gamble With Your Friends
-
-참고 설치본 Assembly-CSharp.dll의 선택 CIL을 조사했다. 실행 검증은 하지 않았다. 파일 SHA-256은 f2147868930f1fc9df3489ef89339759f7eeb8a92c270bec094a4ece6dd2935b, MVID는 d531044a-de62-4d57-85e9-3914d8e9adc0다.
-
-- DisplaySettingsApplier.Apply: 해상도·화면 모드·주사율을 Screen.SetResolution으로 적용.
-- FramerateSettingsApplier.Apply: FPS를 Application.targetFrameRate로 적용. VSync는 QualitySettings.vSyncCount에 연결.
-- SoundSettings: 전체·음악·SFX·VOIP 구분.
-- InputSettingsApplier: inputvolume을 FMODMicrophoneInput.InputGain에 적용. Dissonance의 말하기 모드와 IsMuted 제어.
-- EscapeMenuVoiceList 및 PlayerVoiceVolumePersistence: 참가자별 음량 저장·복원.
-
-REA 근거: ev_cc6648c6c7797b8dca77d7d4e497bac968042e306e2464872459b45d135982e0. 원본의 VoiceActivation은 음성 활성화 방식이며 우리 항상 열림과 같은 동작으로 단정하지 않았다. Dissonance·FMOD 코드나 음원을 프로젝트에 복사하지 않았다.
-
-### MECCHA CHAMELEON
-
-참고 설치본의 Manifest_UFSFiles_Win64.txt에서 설정 자산 경로를 확인했다. WBP_ConfigSound, WBP_ConfigGraphic, WBP_ConfigGameGeneral, WBP_ComboBox_ScreenMode, WBP_SettingSliderFPS, WBP_PerformaiceMode, 음성 입력/출력 장치, VoiceChatUserSettings와 VoiceChatLists가 포함된다. 경로 존재만으로 실제 동작·기본값까지 확인했다고 표현하지 않았다.
-
-### 리그 오브 레전드
-
-[Riot 공식 음성 안내](https://support.riotgames.com/en-us/league-of-legends/performance/league-voice-chat-troubleshooting)에서 눌러서 말하기와 입력 모드·장치 설정 설명을 확인했다. 우리 게임은 말하기 키와 입력/수신 음량을 채택하고, Riot의 파티 음성 서비스나 장치 선택 구현을 사용하지 않는다.
-
-### Stacklands
-
-[개발팀의 2023-10-16 v1.4.1.20 공지](https://store.steampowered.com/news/posts/?enddate=1697466252&feed=steam_community_announcements)의 Stacklands 항목에서 음악·SFX 음량 슬라이더 추가를 확인했다. 이는 과거 패치 근거이며 현재 전체 설정 도감을 조사한 결과는 아니다. 이번 환경에서 Stacklands 설치본은 확인되지 않아 실행·배포 코드 조사는 하지 않았다.
-
 ## 전송 구조와 확인 범위
 
 음성은 규칙 데이터와 별도인 Steam Networking Messages 채널 18을 사용한다. 방 ID·경기 구분 Guid·현재 실제 송신자 ID·멤버 목록을 검사한다. 방 밖의 송신자, 자기 자신의 패킷, 이전 방/경기 패킷은 재생하지 않는다. 로비는 별도 빈 Guid를 사용한다.
