@@ -28,7 +28,7 @@ namespace Marble.Unity
             public bool fourPawnPortraitsLoaded,fourPawnsSeparated;
             public int fortuneTiles,bonusTiles,resortTiles;
             public float floorTopAlignmentError;
-            public string[] errors;
+            public string[] errors, failedChecks;
         }
         IEnumerator VisionRuntimeCheck(string folder)
         {
@@ -157,7 +157,32 @@ namespace Marble.Unity
             yield return new WaitForSeconds(.5f);yield return new WaitForEndOfFrame();
             var spread=CaptureVisionFrame(folder,"13-four-pawns-spread",report);Destroy(spread);
             Application.logMessageReceived-=collect;report.errors=errors.ToArray();
-            report.status=report.fourPawnPortraitsLoaded && report.fourPawnsSeparated && report.fortuneTilesNeutral && report.resortsMatchLineColors && report.bonusColorPreserved && report.ownedResortMiniatureVisible && report.fortuneTiles==4 && report.bonusTiles==1 && report.resortTiles==5 && report.downloadedBuildingLoaded && report.miniaturesFaceInward && report.visibleMiniatureBuildings==13 && report.buildingSourceVertices>0 && report.signatureColorPanels==19 && report.signatureColorsVisible && report.downloadedFloorLoaded && report.floorTiles==32 && report.floorSourceVertices>0 && report.floorTopAlignmentError<.05f && report.framesRendered && report.uiUnchanged && report.sideSpecific && report.singleEyeGradientExpanded && report.comfortReducedMask && report.restoredVision && report.otherSeatUnaffected && report.disabledEconomyUnaffected && report.movingVisionAnchored && report.nearVisionVisible && report.distantWorldDimmed && report.progressiveGradient && report.nearVisionFollowsPawn && errors.Count==0?"passed":"failed";
+            var failedChecks = new List<string>();
+            if (!(report.fourPawnPortraitsLoaded && report.fourPawnsSeparated))
+                failedChecks.Add("pawns");
+            if (!(report.fortuneTilesNeutral && report.resortsMatchLineColors && report.bonusColorPreserved &&
+                  report.fortuneTiles == 4 && report.bonusTiles == 1 && report.resortTiles == 5 &&
+                  report.signatureColorPanels == 19 && report.signatureColorsVisible))
+                failedChecks.Add("tile colors");
+            if (!(report.ownedResortMiniatureVisible && report.downloadedBuildingLoaded && report.miniaturesFaceInward &&
+                  report.visibleMiniatureBuildings == 13 && report.buildingSourceVertices > 0))
+                failedChecks.Add("buildings");
+            if (!(report.downloadedFloorLoaded && report.floorTiles == 32 && report.floorSourceVertices > 0 &&
+                  report.floorTopAlignmentError < .05f))
+                failedChecks.Add("board floor");
+            if (!(report.framesRendered && report.uiUnchanged))
+                failedChecks.Add("frames and HUD");
+            if (!(report.sideSpecific && report.singleEyeGradientExpanded))
+                failedChecks.Add("single-eye visibility");
+            if (!(report.comfortReducedMask && report.restoredVision && report.otherSeatUnaffected &&
+                  report.disabledEconomyUnaffected))
+                failedChecks.Add("settings and restoration");
+            if (!(report.movingVisionAnchored && report.nearVisionVisible && report.distantWorldDimmed &&
+                  report.progressiveGradient && report.nearVisionFollowsPawn))
+                failedChecks.Add("moving and radial vision");
+            if (errors.Count > 0) failedChecks.Add("Unity errors");
+            report.failedChecks = failedChecks.ToArray();
+            report.status = failedChecks.Count == 0 ? "passed" : "failed";
             File.WriteAllText(Path.Combine(folder,"runtime-validation.json"),JsonUtility.ToJson(report,true));Application.Quit(report.status=="passed"?0:1);
         }
         Texture2D CaptureVisionFrame(string folder,string name,VisionRuntimeReport report)

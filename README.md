@@ -44,4 +44,13 @@ Validation/Balance/dashboard.html을 브라우저에서 열면 자유 선택 200
 
 Unity Hub에서 ModooMarbleUnity를 열고 Assets/Scenes/Classic.unity를 실행한다. 다운로드한 모델과 텍스처는 사용 권한이 있는 원본에서 Assets/Marble/Resources/Downloaded 아래에 복원한다. Unity의 Build → Validate and build에서 Windows 실행 파일을 만든다.
 
-공통 하네스의 원본은 [GameHarness 저장소](https://github.com/mingsuking1002/GameHarness)에 있다. 소스 검사에는 Unity 설치 경로와 로컬 컴파일 캐시 경로가 필요하다. 공용 HTML 위키 재생성에는 별도 Game-Analysis-Wiki-OpenSource 프로젝트가 필요하다.
+게임 폴더에서 아래 명령을 실행하면 코어 테스트와 런타임·에디터 코드 컴파일을 확인할 수 있다.
+
+~~~powershell
+python ../GameHarness/run.py doctor
+python ../GameHarness/run.py check source
+~~~
+
+Unity Hub 기본 경로에 Unity 6000.3.9f1이 있으면 자동으로 찾는다. 다른 곳에 설치했다면 같은 PowerShell 창에서 `$env:ASURA_UNITY_EDITOR = 'D:/Unity/6000.3.9f1/Editor'`처럼 Editor 폴더를 지정한다. 소스 검사는 Unity를 열기 전에도 실행할 수 있다. Steamworks.NET 참조는 저장소의 패키지 소스에서 컴파일한다.
+
+공통 하네스의 원본은 [GameHarness 저장소](https://github.com/mingsuking1002/GameHarness)에 있다. 공용 HTML 위키 재생성에는 별도 Game-Analysis-Wiki-OpenSource 프로젝트가 필요하다.

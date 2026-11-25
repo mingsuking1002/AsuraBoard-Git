@@ -19,7 +19,21 @@ namespace Marble.Unity
             if(Input.GetKeyDown(KeyCode.Space))BeginDiceCharge();
             if(Input.GetKeyUp(KeyCode.Space))ReleaseDiceCharge();
         }
-        void OnApplicationFocus(bool focused){if(!focused){diceCharging=false;if(preferences!=null && preferences.MuteMicWhenUnfocused){try{roomVoice?.Stop();}catch{}}}}
+        void OnApplicationFocus(bool focused)
+        {
+            if (focused) return;
+            diceCharging = false;
+            if (preferences == null || !preferences.MuteMicWhenUnfocused) return;
+
+            try
+            {
+                roomVoice?.Stop();
+            }
+            catch (System.Exception error)
+            {
+                Debug.LogWarning($"Could not stop microphone capture after focus loss: {error}");
+            }
+        }
         void DrawDiceControl(bool ready)
         {
             ready=ready && CanControlDice;float gauge=DiceGauge;int target=Game.DiceControlTarget(Mathf.RoundToInt(gauge*10),0);

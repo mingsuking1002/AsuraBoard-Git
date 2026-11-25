@@ -8,6 +8,7 @@
 | 증강과 능력 | Documentation/augments.md와 Documentation/special-mechanics.md | 선택 UI와 실제 규칙에 연결된 모듈의 범위를 확인하고 check source |
 | 체력과 무인도 | Core/Game.cs의 ApplyHealthDamage와 Online/OnlineSession.cs의 호스트 효과 처리 | 부분 피해, 체력 0 이동, 탈출 회복, 리플레이와 온라인 동기화를 check source로 확인 |
 | Steam | Assets/Marble/Online과 Documentation/steam-multiplayer.md | 시뮬레이션 결과와 두 계정 실측 결과를 개별 기록 |
+| 시야 검사 | Assets/Marble/Runtime/MarbleVisionRuntimeCheck.cs | check vision에서 보드·HUD·시야 효과를 검사하고 실패 항목 그룹을 failedChecks로 확인 |
 
 ## 체력 효과 연결
 
@@ -25,7 +26,7 @@ python ../GameHarness/run.py doctor
 python ../GameHarness/run.py check source
 ~~~
 
-doctor가 누락 파일을 표시하면 harness.json과 Validation/VerifySource.ps1의 Unity 설치 경로를 확인한다. 소스 검사는 Windows PowerShell 5.1을 사용한다. 런타임 검사는 Builds/Windows에 있는 실행 파일을 실행한다. 변경한 코드를 검사하려면 Unity의 Build → Validate and build로 해당 소스를 먼저 빌드한다. 복제 프로젝트를 썼다면 원본과 동기화한 소스로 빌드했는지 확인한다.
+소스 검사는 Windows PowerShell 5.1과 ProjectVersion.txt에 지정된 Unity Editor에서 실행한다. Unity Hub 기본 위치 외의 설치는 ASURA_UNITY_EDITOR에 Editor 폴더를 지정한다. Steamworks.NET 참조는 패키지 소스에서 컴파일하므로 새 복제본에서도 Unity 에디터를 열기 전에 검사할 수 있다. 런타임 검사는 Builds/Windows에 있는 실행 파일을 실행한다. 변경한 코드를 검사하려면 Unity의 Build → Validate and build로 해당 소스를 먼저 빌드한다. 복제 프로젝트를 썼다면 원본과 동기화한 소스로 빌드했는지 확인한다.
 
 게임 폴더에서 같은 명령의 마지막 인자를 front, dice, loop 중 변경과 관련된 항목으로 바꾼다. Validation/harness-runs 아래 해당 실행의 report.json은 상태와 종료 코드를, run.log는 출력 로그를 담는다. 화면과 실제 결과를 확인한 뒤 HANDOFF.md에 결과 경로와 남은 검사를 적는다.
 

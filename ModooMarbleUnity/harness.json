@@ -3,10 +3,10 @@
     "AGENTS.md",
     "HANDOFF.md",
     "Validation/VerifySource.ps1",
-    "C:/Unity Editer/6000.3.9f1/Editor/Data/DotNetSdkRoslyn/csc.dll",
     "ProjectSettings/ProjectVersion.txt",
-    "Builds/Windows/ModooMarbleClassic.exe",
-    "Builds/Windows/ModooMarbleClassic_Data/Managed/Assembly-CSharp.dll"
+    "Validation/loop-runtime-compile.rsp",
+    "Validation/loop-editor-compile.rsp",
+    "Validation/loop-source-tests.runtimeconfig.json"
   ],
   "tools": [
     "powershell.exe",
@@ -22,6 +22,8 @@
     "replay-online": {"checks": ["source", "front"], "dependsOn": ["health", "movement"]},
     "match-loop": {"checks": ["source", "loop"], "dependsOn": ["health", "movement"]},
     "hud": {"checks": ["front"], "dependsOn": ["health", "movement", "match-loop"]},
+    "vision": {"checks": ["source", "vision"]},
+    "voice": {"checks": ["source", "front"]},
     "content": {"checks": ["data", "source"]},
     "balance": {"checks": ["balance"], "dependsOn": ["health", "movement"]},
     "build": {"checks": ["data", "build-id", "source", "front", "loop", "dice"]}
@@ -48,6 +50,27 @@
         "-File",
         "Validation/VerifySource.ps1"
       ]
+    },
+    "vision": {
+      "requiresCurrentBuild": true,
+      "command": [
+        "Builds/Windows/ModooMarbleClassic.exe",
+        "-marble-vision-check",
+        "{out}",
+        "-screen-fullscreen",
+        "0",
+        "-screen-width",
+        "1440",
+        "-screen-height",
+        "900",
+        "-logFile",
+        "{out}/player.log"
+      ],
+      "identify": [
+        "Builds/Windows/ModooMarbleClassic.exe",
+        "Builds/Windows/ModooMarbleClassic_Data/Managed/Assembly-CSharp.dll"
+      ],
+      "result": "runtime-validation.json"
     },
     "front": {
       "requiresCurrentBuild": true,

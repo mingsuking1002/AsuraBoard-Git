@@ -87,7 +87,6 @@ namespace Marble.Unity
                 DrawAugmentPaper(r,cardTier,true,chosen,i+1);
                 TierRibbon(new Rect(r.x+18,r.y+19,r.width-36,30),cardTier,cardAccent);
                 CircuitArt.Label(new Rect(r.x+20,r.y+20,r.width-40,27),AugmentTierName(cardTier),font,15,ink,true);
-                // Empty icon, title and description spaces remain empty as requested.
                 PaperTheme.Frame(new Rect(r.center.x-31,r.y+76,62,70),new Color(.2f,.22f,.15f,.30f),1.6f,i);
                 PaperTheme.Underline(new Rect(r.x+33,r.y+170,r.width-66,1),new Color(.2f,.22f,.15f,.22f));
                 PaperTheme.Underline(new Rect(r.x+25,r.yMax-61,r.width-50,1),ink);
